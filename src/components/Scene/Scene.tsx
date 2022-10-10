@@ -1,7 +1,8 @@
 import { useFrame, useThree } from "@react-three/fiber";
-import { Event as TreeEvent, Object3D, ObjectLoader } from "three";
+import { Object3D, ObjectLoader } from "three";
 import json from "../../jsonScenes/sceneTemplate.json";
 import React from "react";
+import { OrbitControls } from "@react-three/drei";
 
 export function Scene() {
     const treeState = useThree();
@@ -24,8 +25,11 @@ export function Scene() {
             if (counting === 0) dist = !dist
         }
     })
-    const scene = new ObjectLoader().parse<Object3D<TreeEvent>>(json.scene);
+    const scene = new ObjectLoader().parse<Object3D>(json.scene);
     return (
+    <>
+        <OrbitControls enablePan={false} enableZoom={false} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI / 4} />
         <primitive object={scene}/>
+    </>
     )
 }
