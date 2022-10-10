@@ -1,29 +1,29 @@
-import { useLoader } from "@react-three/fiber";
+import { MeshProps, useLoader } from "@react-three/fiber";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { useTexture } from "@react-three/drei";
-import { PropsWithChildren, useMemo } from "react";
+import React, {  useMemo } from "react";
 import { Mesh } from "three";
 
-type LoadOBJPNGProps = { path: string } & PropsWithChildren
+type LoadOBJPNGProps = { path: string } & MeshProps
 
-export function OBJModel(props: LoadOBJPNGProps) {
-    const obj = useLoader(OBJLoader, `${props.path}.obj`);
-    const texture = useTexture(`${props.path}.png`);
-    const geometry = useMemo(() => {
-        let g;
-        obj.traverse((c) => {
-            if (c.type === "Mesh") {
-                const _c = c as Mesh;
-                g = _c.geometry;
-            }
-        });
-        return g;
-    }, [obj]);
+export const OBJModel = React.forwardRef<Mesh, LoadOBJPNGProps>((props, ref) => {
+        const obj = useLoader(OBJLoader, `${props.path}.obj`);
+        const texture = useTexture(`${props.path}.png`);
+        const geometry = useMemo(() => {
+            let g;
+            obj.traverse((c) => {
+                if (c.type === "Mesh") {
+                    const _c = c as Mesh;
+                    g = _c.geometry;
+                }
+            });
+            return g;
+        }, [obj]);
 
-    return (
-        <mesh geometry={geometry}>
-            <meshPhysicalMaterial map={texture}/>
-            {props.children}
-        </mesh>
-    );
-}
+        return (
+            <mesh ref={ref} geometry={geometry} {...props}>
+                <meshPhysicalMaterial map={texture}/>
+            </mesh>
+        );
+    }
+)

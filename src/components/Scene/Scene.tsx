@@ -29,8 +29,8 @@ export function Scene() {
     const scene = new ObjectLoader().parse<Object3D>(json.scene);
     return (
         <>
-            <OrbitControls enablePan={false}
-                           enableZoom={false}
+            <OrbitControls enablePan={true}
+                           enableZoom={true}
                            minPolarAngle={Math.PI / 4}
                            maxPolarAngle={Math.PI / 4}/>
             <primitive object={scene}/>
