@@ -3,6 +3,7 @@ import { Object3D, ObjectLoader } from "three";
 import json from "../../jsonScenes/sceneTemplate.json";
 import React from "react";
 import { OrbitControls } from "@react-three/drei";
+import { Game } from "../Game/Game";
 
 export function Scene() {
     const treeState = useThree();
@@ -27,9 +28,13 @@ export function Scene() {
     })
     const scene = new ObjectLoader().parse<Object3D>(json.scene);
     return (
-    <>
-        <OrbitControls enablePan={false} enableZoom={false} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI / 4} />
-        <primitive object={scene}/>
-    </>
+        <>
+            <OrbitControls enablePan={false}
+                           enableZoom={false}
+                           minPolarAngle={Math.PI / 4}
+                           maxPolarAngle={Math.PI / 4}/>
+            <primitive object={scene}/>
+            <Game/>
+        </>
     )
 }
