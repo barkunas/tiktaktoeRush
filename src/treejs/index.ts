@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
-import json from "./sceneTemplate.json"
+import json from "../jsonScenes/sceneTemplate.json"
 
 
 /*var scene = new THREE.Scene();*/
