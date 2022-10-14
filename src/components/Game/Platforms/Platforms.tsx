@@ -1,6 +1,6 @@
 import { OBJModel } from "../../Helpers/OBJModel";
-import { MutableRefObject, Ref, useEffect, useRef, useState } from "react";
-import { AxesHelper, Box3, BufferGeometry, Color, Euler, Material, Mesh, MeshPhysicalMaterial, Vector3 } from "three";
+import {  useRef } from "react";
+import { Color, Euler, Group, Mesh, MeshPhysicalMaterial } from "three";
 import { ResourcesPaths } from "../../../configs/resources"
 import { ThreeEvent } from "@react-three/fiber";
 
@@ -19,7 +19,6 @@ export function Platforms() {
         mesh.position.setY(0);
 
     })*/
-    const axesHelper = new AxesHelper(5);
     const platformOnPointerEnterHandler = (e: ThreeEvent<MouseEvent>) => {
         const target = e.eventObject as Mesh;
         const material = target.material as MeshPhysicalMaterial
