@@ -1,12 +1,12 @@
 import { OBJModel } from "../../Helpers/OBJModel";
 import { MutableRefObject, Ref, useEffect, useRef, useState } from "react";
-import { Box3, BufferGeometry, Material, Mesh, Vector3 } from "three";
+import { AxesHelper, Box3, BufferGeometry, Euler, Material, Mesh, Vector3 } from "three";
+import { ResourcesPaths } from "../../../configs/resources"
+
 
 export function Platforms() {
     const ref = useRef<Mesh>(null!);
-    const platformPath = "/models/platform/platform1";
     console.log("Mesh")
-    console.log(ref)
     /*useEffect(() => {
         const mesh = ref.current;
         const box = new Box3();
@@ -18,21 +18,29 @@ export function Platforms() {
         mesh.position.setY(0);
 
     })*/
+    const axesHelper = new AxesHelper(5);
     return (
-        <group position={[-8,0,0]}>
-            <OBJModel ref={ref} path={platformPath} position={[0,0,0]}/>
-            <OBJModel path={platformPath} position={[0,0,4]}/>
-            <OBJModel path={platformPath} position={[0,0,8]}/>
+        <>
+            <axesHelper/>
+            <group position={[-8, 0, 0]}>
+                <OBJModel ref={ref} path={ResourcesPaths.platform1} position={[0, 0, 0]}/>
+                <group position={[0, 0, 4]}>
+                    <OBJModel path={ResourcesPaths.platform1} />
+                    <OBJModel path={ResourcesPaths.point1} position={[2, 0, 1]} rotation={new Euler(0,0.8)}/>
+                </group>
+                <OBJModel path={ResourcesPaths.platform1} position={[0, 0, 8]}/>
 
-            <OBJModel path={platformPath} position={[4,0,0]}/>
-            <OBJModel path={platformPath} position={[4,0,4]}/>
-            <OBJModel path={platformPath} position={[4,0,8]}/>
+                <OBJModel path={ResourcesPaths.platform1} position={[4, 0, 0]}/>
+                <OBJModel path={ResourcesPaths.platform1} position={[4, 0, 4]}/>
+                <OBJModel path={ResourcesPaths.platform1} position={[4, 0, 8]}/>
 
-            <OBJModel path={platformPath} position={[8,0,0]}/>
-            <OBJModel path={platformPath} position={[8,0,4]}/>
-            <OBJModel path={platformPath} position={[8,0,8]}/>
-        </group>
+                <group position={[8, 0, 0]}>
+                    <OBJModel path={ResourcesPaths.platform1} />
+                    <OBJModel path={ResourcesPaths.point2}/>
+                </group>
+                <OBJModel path={ResourcesPaths.platform1} position={[8, 0, 4]}/>
+                <OBJModel path={ResourcesPaths.platform1} position={[8, 0, 8]}/>
+            </group>
+        </>
     );
 }
-
-
