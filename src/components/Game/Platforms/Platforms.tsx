@@ -1,6 +1,6 @@
 import { OBJModel } from "../../Helpers/OBJModel";
 import {  useRef } from "react";
-import { Color, Euler, Group, Mesh, MeshPhysicalMaterial } from "three";
+import { Color, Euler, Mesh, MeshPhysicalMaterial } from "three";
 import { ResourcesPaths } from "../../../configs/resources"
 import { ThreeEvent } from "@react-three/fiber";
 
