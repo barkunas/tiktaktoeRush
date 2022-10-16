@@ -1,9 +1,10 @@
 import { PlatformPillarItem } from "./PlatformPillarItem";
 import { BlockerType, globalOffset, ModelPositionType } from "./Platforms";
 import { ItemObjectType, ItemType } from "./ItemType";
-import { useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useReducer, useRef, useState } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import { GameElement } from "./GameElement";
+import { Group, Vector3 } from "three";
 
 export type PlatformPillarProps = {
     pillarModel: ItemObjectType[]
@@ -33,6 +34,25 @@ export function PlatformPillar(props: PlatformPillarProps) {
         props.updateModel3D(props.positionInModel)
 
     }
+
+    const el0 = useMemo(() => {
+        return props.pillarModel[0].type !== ItemType.Empty
+            ? <GameElement elementType={props.pillarModel[0]}/>
+            : null
+    }, [props.pillarModel[0].type])
+    const el1 = useMemo(() => {
+        return props.pillarModel[1].type !== ItemType.Empty
+            ? <GameElement elementType={props.pillarModel[1]}/>
+            : null
+    }, [props.pillarModel[1].type])
+    const el2 = useMemo(() => {
+        return props.pillarModel[2].type !== ItemType.Empty
+            ? <GameElement elementType={props.pillarModel[2]}/>
+            : null
+    }, [props.pillarModel[2].type])
+
+    const memoElementArr = [el0, el1, el2]
+
     const pillars = props.pillarModel.map((it, index) => {
         return (
             <group
@@ -41,7 +61,7 @@ export function PlatformPillar(props: PlatformPillarProps) {
                 onClick={onclickHandler}
                 position={[props.positionX, index * globalOffset, props.positionY]}
                 key={index}>
-                {it.type !== ItemType.Empty && <GameElement elementType={it}/>}
+                {memoElementArr[index]}
                 <PlatformPillarItem opacity={opacity}/>
             </group>
         )
