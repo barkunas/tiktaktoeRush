@@ -3,13 +3,13 @@ import { OBJModel } from "../Helpers/OBJModel";
 import { ResourcesPaths } from "../../configs/resources";
 import { ThreeEvent } from "@react-three/fiber";
 import { BlockerType, PlatformsModel, UpdateModelFn } from "./Platforms";
-import { ItemType } from "./ItemType";
+import { ItemObjectType, ItemType } from "./ItemType";
 import { Item } from "./Item";
 
 type PlatformItemProps = {
     rowIndex: number,
     cellIndex: number,
-    itemType: ItemType,
+    itemType: ItemObjectType,
     model: PlatformsModel,
     updateModel: UpdateModelFn
     clickBlocker: BlockerType
@@ -32,8 +32,8 @@ export function PlatformItem(props: PlatformItemProps) {
         const position = target.name.split("-");
         const x = Number(position[0]);
         const y = Number(position[1]);
-        if (props.model[x][y] === ItemType.Empty) {
-            props.model[x][y] = getRandomAItemType()
+        if (props.model[x][y].type === ItemType.Empty) {
+            props.model[x][y].type = getRandomAItemType()
             props.updateModel(props.model)
         }
     }

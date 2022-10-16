@@ -1,15 +1,15 @@
-import { ItemType } from "./ItemType";
+import { ItemObjectType, ItemType } from "./ItemType";
 import { OBJModel } from "../Helpers/OBJModel";
 import { ResourcesPaths } from "../../configs/resources";
 import { Euler } from "three";
 
 export type ItemProps = {
-    type: ItemType
+    type: ItemObjectType
 }
 
 
 export function Item(props: ItemProps) {
-    switch (props.type) {
+    switch (props.type.type) {
         case ItemType.Empty:
             return null
         case ItemType.Circle:

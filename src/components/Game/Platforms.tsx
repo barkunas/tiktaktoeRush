@@ -1,67 +1,48 @@
 import { useState } from "react";
-import { PlatformItem } from "./PlatformItem";
-import { ItemType } from "./ItemType";
+import { ItemObjectType, ItemType } from "./ItemType";
 import { PlatformPillar } from "./PlatformPillar";
 
-export type PlatformsModel = ItemType[][];
+export type PlatformsModel = ItemObjectType[][];
 export type UpdateModelFn = (model: PlatformsModel) => void;
 export type BlockerType = boolean;
 export type Model3DType = PillarModelType[][];
-export type PillarModelType = ItemType[];
+export type PillarModelType = ItemObjectType[];
 export type ModelPositionType = [number, number]
 
-const initialModel: PlatformsModel = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 const initialBlocker: BlockerType = false
 const initialModel3D: Model3DType = [
-    [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
-    [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
-    [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    [[{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}]],
+    [[{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}]],
+    [[{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}]]
 ]
 
 export function Platforms() {
-    const [model, setModel] = useState<PlatformsModel>(initialModel)
     const [blocker, setBlocker] = useState<BlockerType>(initialBlocker)
     const [model3D, setModel3D] = useState<Model3DType>(initialModel3D)
-    const updateModel: UpdateModelFn = (model: PlatformsModel) => {
-        const {hasChanges, newModel} = checkFullLine(model);
-        setModel([...model])
-        if (hasChanges) {
-            setBlocker(true)
-            setTimeout(() => {
-                console.log("tik")
-                setModel(newModel)
-                setBlocker(false)
-            }, 2000)
-        }
-
-    }
     const updateModel3D = (position: ModelPositionType) => {
         const newModel = JSON.parse(JSON.stringify(model3D)) as Model3DType;
         const pillarModel = newModel[position[0]][position[1]];
         for (let i = 0; i < pillarModel.length; i++) {
-            if (pillarModel[i] === ItemType.Empty) {
-                pillarModel[i] = getRandomAItemType()
+            if (pillarModel[i].type === ItemType.Empty) {
+                pillarModel[i].type = getRandomAItemType()
+                const newModel2 = JSON.parse(JSON.stringify(newModel)) as Model3DType;
+                const items = ItemFinder.findAllLines3D(newModel2)
                 setModel3D(newModel);
+                if (items.length !== 0) {
+                    setBlocker(true);
+                    setTimeout(() => {
+                        items.forEach(it => {
+                            it.type = ItemType.Empty;
+                        })
+                        setModel3D(newModel2)
+                        setBlocker(false)
+                    }, 2000)
+                }
                 break;
             }
         }
 
     }
-    const platforms: JSX.Element[] = []
-    model.forEach((row, rowInd) => {
-        row.forEach((cell, cellInd) => {
-            platforms.push(
-                <PlatformItem
-                    rowIndex={rowInd}
-                    cellIndex={cellInd}
-                    itemType={model[rowInd][cellInd]}
-                    model={model}
-                    updateModel={updateModel}
-                    clickBlocker={blocker}
-                />
-            );
-        })
-    })
     const pillars: JSX.Element[] = [];
     model3D.forEach((section, sectionIndex) => {
         section.forEach((pillarModel, pillarModelIndex) => {
@@ -73,17 +54,14 @@ export function Platforms() {
                                 pillarModel={pillarModel}
                                 updateModel3D={updateModel3D}
                                 positionInModel={[sectionIndex, pillarModelIndex]}
+                                clickBlocker={blocker}
                 />
             )
         })
     })
-
     return (
         <>
             <axesHelper/>
-            {/*<group position={[-8, 0, 0]}>
-                {platforms}
-            </group>*/}
             <group position={[-8, 0, 0]}>
                 {pillars}
             </group>
@@ -93,60 +71,59 @@ export function Platforms() {
 
 export const globalOffset = 4;
 
+class ItemFinder {
 
-function checkFullLine(model: PlatformsModel): { hasChanges: boolean, newModel: PlatformsModel } {
-    const newModel = JSON.parse(JSON.stringify(model)) as PlatformsModel
-    let hasChanges = false
-    const changes: (() => void)[] = []
-    newModel.forEach((row, index) => {
-        if (!row.some(c => c === ItemType.Empty) && row.every(i => i === row[0])) {
-            hasChanges = true
-            changes.push(() => {
-                newModel[index] = row.map(i => ItemType.Empty)
-            })
+    static findAllLines3D(model: Model3DType) {
+        let items: ItemObjectType[] = [];
+        model.forEach((pillars, x) => {
+            pillars.forEach((pillar, y) => {
+                pillar.forEach((item, z) => {
+                    if (item.type !== ItemType.Empty) {
+                        items = [...items, ...(new ItemFinder(model, item, x, y, z).check())]
+                    }
+                });
+            });
+        });
+        return items;
+    }
+
+    constructor(private readonly model3D: Model3DType, public readonly link: ItemObjectType, public readonly x: number, public readonly y: number, public readonly z: number) {
+    }
+
+    public check() {
+        const x = this.x;
+        const y = this.y;
+        const z = this.z;
+        return [
+            ...this.checkNeighbours([x, y, z + 1], [x, y, z - 1]),//
+            ...this.checkNeighbours([x + 1, y, z], [x - 1, y, z]),//
+            ...this.checkNeighbours([x, y + 1, z], [x, y - 1, z]),//
+            ...this.checkNeighbours([x-1, y-1, z], [x+1, y+1, z]),//
+            ...this.checkNeighbours([x+1, y-1, z], [x-1, y+1, z]),//
+            ...this.checkNeighbours([x - 1, y, z + 1], [x + 1, y, z - 1]),//
+            ...this.checkNeighbours([x + 1, y, z + 1], [x - 1, y, z - 1]),//
+            ...this.checkNeighbours([x, y + 1, z + 1], [x, y - 1, z - 1]),//
+            ...this.checkNeighbours([x, y + 1, z - 1], [x, y - 1, z + 1]),//
+            ...this.checkNeighbours([x + 1, y + 1, z + 1], [x - 1, y - 1, z - 1]),//
+            ...this.checkNeighbours([x - 1, y + 1, z - 1], [x + 1, y - 1, z + 1]),//
+            ...this.checkNeighbours([x - 1, y + 1, z + 1], [x + 1, y - 1, z - 1]),//
+            ...this.checkNeighbours([x + 1, y + 1, z - 1], [x - 1, y - 1, z + 1]),//
+        ];
+    }
+
+    private checkNeighbours(left: [x: number, y: number, z: number], right: [x: number, y: number, z: number]): ItemObjectType[] {
+        try {
+            const _left = this.model3D[left[0]][left[1]][left[2]]
+            const _right = this.model3D[right[0]][right[1]][right[2]]
+            if (_left.type === this.link.type && _right.type === this.link.type) {
+                return [this.link, _left, _right]
+            }
+            return []
+        } catch (e) {
+            return []
         }
-        row.forEach((cell, index) => {
-            const result = newModel.map(r => r[index]);
-            if (!result.some(c => c === ItemType.Empty) && result.every(it => it === cell)) {
-                hasChanges = true
-                changes.push(() => {
-                    newModel.forEach((row) => {
-                        row[index] = ItemType.Empty
-                    })
-                })
-            }
-        })
-    });
-
-    const diagonal1: ItemType[] = []
-    for (let i = 0; i < newModel.length; i++) {
-        diagonal1.push(newModel[i][i])
-    }
-    if (!diagonal1.some(c => c === ItemType.Empty) && diagonal1.every(it => it === diagonal1[0])) {
-        hasChanges = true
-        changes.push(() => {
-            for (let i = 0; i < newModel.length; i++) {
-                newModel[i][i] = ItemType.Empty
-            }
-        })
     }
 
-    const diagonal2: ItemType[] = []
-    for (let i = 0, k = newModel.length - 1; i < newModel.length; i++, k--) {
-        diagonal2.push(newModel[i][k])
-    }
-    if (!diagonal2.some(c => c === ItemType.Empty) && diagonal2.every(it => it === diagonal2[0])) {
-        hasChanges = true
-        changes.push(() => {
-            for (let i = 0, k = newModel.length - 1; i < newModel.length; i++, k--) {
-                newModel[i][k] = ItemType.Empty
-            }
-        })
-    }
-
-
-    changes.forEach((fnc) => fnc())
-    return {hasChanges, newModel}
 }
 
 function getRandomAItemType() {

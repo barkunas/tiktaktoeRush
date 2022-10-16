@@ -7,9 +7,3 @@ export enum ItemType {
 export type ItemObjectType = {
     type: ItemType
 }
-
-export enum ItemType2 {
-    Empty,
-    Circle,
-    Cross
-}

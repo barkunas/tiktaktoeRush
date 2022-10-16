@@ -1,16 +1,17 @@
 import { PlatformPillarItem } from "./PlatformPillarItem";
-import { globalOffset, ModelPositionType } from "./Platforms";
-import { ItemType } from "./ItemType";
+import { BlockerType, globalOffset, ModelPositionType } from "./Platforms";
+import { ItemObjectType, ItemType } from "./ItemType";
 import { useState } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import { GameElement } from "./GameElement";
 
 export type PlatformPillarProps = {
-    pillarModel: ItemType[]
+    pillarModel: ItemObjectType[]
     positionX: number,
     positionY: number,
     updateModel3D: (position: ModelPositionType) => void,
-    positionInModel: ModelPositionType
+    positionInModel: ModelPositionType,
+    clickBlocker: BlockerType
 }
 
 const defaultOpacity = 0.5;
@@ -27,6 +28,7 @@ export function PlatformPillar(props: PlatformPillarProps) {
         setOpacity(defaultOpacity)
     }
     const onclickHandler = (e: ThreeEvent<MouseEvent>) => {
+        if (props.clickBlocker) return;
         e.stopPropagation();
         props.updateModel3D(props.positionInModel)
 
@@ -39,7 +41,7 @@ export function PlatformPillar(props: PlatformPillarProps) {
                 onClick={onclickHandler}
                 position={[props.positionX, index * globalOffset, props.positionY]}
                 key={index}>
-                {it !== ItemType.Empty && <GameElement elementType={it}/>}
+                {it.type !== ItemType.Empty && <GameElement elementType={it}/>}
                 <PlatformPillarItem opacity={opacity}/>
             </group>
         )
