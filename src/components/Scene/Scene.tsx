@@ -1,4 +1,4 @@
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import {  Object3D, ObjectLoader } from "three";
 import json from "../../jsonScenes/sceneTemplate.json";
 import React from "react";
@@ -6,13 +6,8 @@ import { OrbitControls} from "@react-three/drei";
 import { Game } from "../Game/Game";
 
 export function Scene() {
-    const treeState = useThree();
-    console.log(treeState.scene)
-    const camera = treeState.camera
     let counting = 0;
     let dist = true;
-    console.log("camera.rotation")
-    console.log(camera)
     useFrame((state) => {
 
         //camera.rotateX(0.001)

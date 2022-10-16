@@ -1,4 +1,4 @@
-import { Platforms } from "./Platforms/Platforms";
+import { Platforms } from "./Platforms";
 
 export function Game() {
 
