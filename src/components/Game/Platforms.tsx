@@ -8,6 +8,7 @@ export type UpdateModelFn = (model: PlatformsModel) => void;
 export type BlockerType = boolean;
 export type Model3DType = PillarModelType[][];
 export type PillarModelType = ItemType[];
+export type ModelPositionType = [number, number]
 
 const initialModel: PlatformsModel = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 const initialBlocker: BlockerType = false
@@ -18,9 +19,9 @@ const initialModel3D: Model3DType = [
 ]
 
 export function Platforms() {
-    const [model, setModel] = useState(initialModel)
-    const [blocker, setBlocker] = useState(initialBlocker)
-    const [model3D, setModel3D] = useState(initialModel3D)
+    const [model, setModel] = useState<PlatformsModel>(initialModel)
+    const [blocker, setBlocker] = useState<BlockerType>(initialBlocker)
+    const [model3D, setModel3D] = useState<Model3DType>(initialModel3D)
     const updateModel: UpdateModelFn = (model: PlatformsModel) => {
         const {hasChanges, newModel} = checkFullLine(model);
         setModel([...model])
@@ -31,6 +32,18 @@ export function Platforms() {
                 setModel(newModel)
                 setBlocker(false)
             }, 2000)
+        }
+
+    }
+    const updateModel3D = (position: ModelPositionType) => {
+        const newModel = JSON.parse(JSON.stringify(model3D)) as Model3DType;
+        const pillarModel = newModel[position[0]][position[1]];
+        for (let i = 0; i < pillarModel.length; i++) {
+            if (pillarModel[i] === ItemType.Empty) {
+                pillarModel[i] = ItemType.Cross
+                setModel3D(newModel);
+                break;
+            }
         }
 
     }
@@ -58,6 +71,8 @@ export function Platforms() {
                                 positionY={globalOffset * pillarModelIndex}
                                 key={`${globalOffset * sectionIndex}${globalOffset * pillarModelIndex}`}
                                 pillarModel={pillarModel}
+                                updateModel3D={updateModel3D}
+                                positionInModel={[sectionIndex, pillarModelIndex]}
                 />
             )
         })
