@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ItemObjectType, ItemType } from "./ItemType";
+import { ItemObjectType, ItemStatus, ItemType } from "./ItemType";
 import { PlatformPillar } from "./PlatformPillar";
 import { ItemFinder } from "./ItemFinder";
 
@@ -8,13 +8,17 @@ export type Model3DType = PillarModelType[][];
 export type PillarModelType = ItemObjectType[];
 export type ModelPositionType = [number, number]
 export const globalOffset = 4;
+export const pillarSize = 3;
 
 const initialBlocker: BlockerType = false
-const initialModel3D: Model3DType = [
-    [[{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}]],
-    [[{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}]],
-    [[{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}], [{type: ItemType.Empty}, {type: ItemType.Empty}, {type: ItemType.Empty}]]
-]
+let initialModel3D: Model3DType = [[[], [], []], [[], [], []], [[], [], []]];
+initialModel3D.forEach(k => {
+    k.forEach(t => {
+        for (let i = 0; i < 3; i++) {
+            t.push({type: ItemType.Empty, status: ItemStatus.New})
+        }
+    })
+})
 
 export function Platforms() {
     const [blocker, setBlocker] = useState<BlockerType>(initialBlocker)
@@ -24,25 +28,37 @@ export function Platforms() {
         const pillarModel = newModel[position[0]][position[1]];
         for (let i = 0; i < pillarModel.length; i++) {
             if (pillarModel[i].type === ItemType.Empty) {
-                pillarModel[i].type = getRandomAItemType()
-                const newModel2 = JSON.parse(JSON.stringify(newModel)) as Model3DType;
-                const items = ItemFinder.findAllLines3D(newModel2)
+                pillarModel[i].type = getRandomAItemType();
                 setModel3D(newModel);
-                if (items.length !== 0) {
-                    setBlocker(true);
-                    setTimeout(() => {
-                        items.forEach(it => {
-                            it.type = ItemType.Empty;
-                        })
-                        setModel3D(newModel2)
-                        setBlocker(false)
-                    }, 2000)
-                }
+                setBlocker(true);
+                requrciveChecking(newModel)
                 break;
             }
         }
-
     }
+
+    function requrciveChecking(model: Model3DType) {
+        const newModel2 = JSON.parse(JSON.stringify(model)) as Model3DType;
+        const items = ItemFinder.findAllLines3D(newModel2)
+        if (items.length !== 0) {
+            setTimeout(() => {
+                items.forEach(it => {
+                    it.type = ItemType.Empty;
+                    it.status = ItemStatus.New;
+                })
+                setModel3D(newModel2)
+                setTimeout(() => {
+                    const newModel3 = JSON.parse(JSON.stringify(newModel2)) as Model3DType;
+                    fallItemsToEmptyPlaces(newModel3)
+                    setModel3D(newModel3)
+                    requrciveChecking(newModel3)
+                }, 300)
+            }, 1100);
+        } else {
+            setBlocker(false)
+        }
+    }
+
     const pillars: JSX.Element[] = [];
     model3D.forEach((section, sectionIndex) => {
         section.forEach((pillarModel, pillarModelIndex) => {
@@ -74,4 +90,17 @@ function getRandomAItemType() {
     const min = 1;
     const max = 2
     return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+export function fallItemsToEmptyPlaces(model: Model3DType) {
+    model.forEach((pillars, pillarsIndex) => {
+        pillars.forEach((pillar, pillarIndex) => {
+            pillars[pillarIndex] = pillar.filter(it => it.type !== ItemType.Empty);
+            pillars[pillarIndex].forEach(it => it.status = ItemStatus.Old);
+            while (pillars[pillarIndex].length < pillarSize) {
+                pillars[pillarIndex].push({type: ItemType.Empty, status: ItemStatus.New})
+            }
+        })
+    })
+    return model;
 }

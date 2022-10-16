@@ -4,6 +4,12 @@ export enum ItemType {
     Cross
 }
 
+export enum ItemStatus {
+    New,
+    Old
+}
+
 export type ItemObjectType = {
-    type: ItemType
+    type: ItemType,
+    status: ItemStatus
 }
