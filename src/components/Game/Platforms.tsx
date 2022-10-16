@@ -40,7 +40,7 @@ export function Platforms() {
         const pillarModel = newModel[position[0]][position[1]];
         for (let i = 0; i < pillarModel.length; i++) {
             if (pillarModel[i] === ItemType.Empty) {
-                pillarModel[i] = ItemType.Cross
+                pillarModel[i] = getRandomAItemType()
                 setModel3D(newModel);
                 break;
             }
@@ -115,7 +115,6 @@ function checkFullLine(model: PlatformsModel): { hasChanges: boolean, newModel: 
                     })
                 })
             }
-
         })
     });
 
@@ -148,4 +147,10 @@ function checkFullLine(model: PlatformsModel): { hasChanges: boolean, newModel: 
 
     changes.forEach((fnc) => fnc())
     return {hasChanges, newModel}
+}
+
+function getRandomAItemType() {
+    const min = 1;
+    const max = 2
+    return Math.floor(Math.random() * (max - min + 1) + min)
 }
