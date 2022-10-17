@@ -1,10 +1,9 @@
 import { PlatformPillarItem } from "./PlatformPillarItem";
 import { BlockerType, globalOffset, ModelPositionType } from "./Platforms";
 import { ItemObjectType, ItemType } from "./ItemType";
-import { createContext, useCallback, useContext, useMemo, useReducer, useRef, useState } from "react";
+import {  useMemo, useState } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import { GameElement } from "./GameElement";
-import { Group, Vector3 } from "three";
 
 export type PlatformPillarProps = {
     pillarModel: ItemObjectType[]
