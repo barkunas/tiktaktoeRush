@@ -4,7 +4,7 @@ import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import json from "../jsonScenes/sceneTemplate.json"
 
 
-/*var scene = new THREE.Scene();*/
+/*var scene = new THREE.App();*/
 const scene2 = new THREE.ObjectLoader().parse(json.scene);
 /*
 console.log(scene)

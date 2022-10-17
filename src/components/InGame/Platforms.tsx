@@ -2,6 +2,8 @@ import { useState } from "react";
 import { ItemObjectType, ItemStatus, ItemType } from "./ItemType";
 import { PlatformPillar } from "./PlatformPillar";
 import { ItemFinder } from "./ItemFinder";
+import { useDispatch } from "react-redux";
+import { increment } from "../../redux/GameCounterReducer";
 
 export type BlockerType = boolean;
 export type Model3DType = PillarModelType[][];
@@ -23,6 +25,7 @@ initialModel3D.forEach(k => {
 export function Platforms() {
     const [blocker, setBlocker] = useState<BlockerType>(initialBlocker)
     const [model3D, setModel3D] = useState<Model3DType>(initialModel3D)
+    const dispatch = useDispatch();
     const updateModel3D = (position: ModelPositionType) => {
         const newModel = JSON.parse(JSON.stringify(model3D)) as Model3DType;
         const pillarModel = newModel[position[0]][position[1]];
@@ -45,6 +48,8 @@ export function Platforms() {
                 items.forEach(it => {
                     it.type = ItemType.Empty;
                     it.status = ItemStatus.New;
+                    console.log("tuk")
+                    dispatch(increment())
                 })
                 setModel3D(newModel2)
                 setTimeout(() => {
@@ -62,7 +67,6 @@ export function Platforms() {
     const pillars: JSX.Element[] = [];
     model3D.forEach((section, sectionIndex) => {
         section.forEach((pillarModel, pillarModelIndex) => {
-            console.log("tik")
             pillars.push(
                 <PlatformPillar positionX={globalOffset * sectionIndex}
                                 positionY={globalOffset * pillarModelIndex}

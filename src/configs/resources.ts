@@ -9,3 +9,6 @@ export const ResourcesPaths =  {
 export const ResourcesUI =  {
     pinkBlock:"/models/ui/pink_block"
 };
+export const ResourcesMenu = {
+    playBtn:"/models/mainMenu/play_btn"
+}
