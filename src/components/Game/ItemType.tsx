@@ -1,7 +1,10 @@
 export enum ItemType {
     Empty,
     Circle,
-    Cross
+    Cross,
+    GreenBox,
+    BlueBox,
+    PinkBox
 }
 
 export enum ItemStatus {

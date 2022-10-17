@@ -40,6 +40,15 @@ export function GameElement(props: GameElementProps) {
         case ItemType.Cross:
             path = ResourcesPaths.point2;
             break;
+        case ItemType.GreenBox:
+            path = ResourcesPaths.point3;
+            break;
+        case ItemType.BlueBox:
+            path = ResourcesPaths.point4;
+            break;
+        case ItemType.PinkBox:
+            path = ResourcesPaths.point5;
+            break;
         default:
             return null
     }
