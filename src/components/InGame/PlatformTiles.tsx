@@ -99,7 +99,7 @@ export function PlatformTiles(props: PlatformTilesProps) {
 function getRandomAItemType() {
     //return 3
     const min = 3;
-    const max = 5
+    const max = 5;
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 

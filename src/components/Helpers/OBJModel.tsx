@@ -14,6 +14,7 @@ type LoadOBJPNGProps = {
 export const OBJModel = React.forwardRef<Mesh, LoadOBJPNGProps>((props, ref) => {
         const obj = useLoader(OBJLoader, `${props.path}.obj`);
         const texture = useTexture(`${props.path}.png`);
+
         const geometry = useMemo(() => {
             let g;
             obj.traverse((c) => {
@@ -31,6 +32,32 @@ export const OBJModel = React.forwardRef<Mesh, LoadOBJPNGProps>((props, ref) => 
                                       color={props.color}
                                       opacity={props.opacity}
                                       transparent={props.transparent}
+                />
+            </mesh>
+        );
+    }
+)
+
+export const ObjModel2 = React.forwardRef<Mesh, LoadOBJPNGProps>((props, ref) => {
+        const obj = useLoader(OBJLoader, `${props.path}.obj`);
+        const texture = useTexture(`${props.path}.png`);
+
+        const geometry = useMemo(() => {
+            let g;
+            obj.traverse((c) => {
+                if (c.type === "Mesh") {
+                    const _c = c as Mesh;
+                    g = _c.geometry;
+                }
+            });
+            return g;
+        }, [obj]);
+
+        return (
+            <mesh castShadow ref={ref} geometry={geometry} {...props}>
+                <meshNormalMaterial /*color={props.color}*/
+                    opacity={props.opacity}
+                    transparent={props.transparent}
                 />
             </mesh>
         );

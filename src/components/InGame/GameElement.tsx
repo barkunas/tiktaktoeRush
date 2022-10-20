@@ -1,8 +1,9 @@
-import { OBJModel } from "../Helpers/OBJModel";
+import { OBJModel, ObjModel2 } from "../Helpers/OBJModel";
 import { ResourcesPaths } from "../../configs/resources";
 import { ItemObjectType, ItemType } from "./ItemType";
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { animated, useSpring } from "@react-spring/three";
+import { Vector3 } from "three";
 
 type GameElementProps = {
     elementType: ItemObjectType,
@@ -28,66 +29,50 @@ function getPath(type: ItemType): string {
         case ItemType.PinkBox:
             path = ResourcesPaths.point5;
             break;
+        case ItemType.Stone_0:
+            path = ResourcesPaths.point6;
+            break;
         default:
             return path
     }
     return path
 }
 
-export function GameElement(_props: GameElementProps) {
-    const prevType = usePrevious(_props.positionY) || ItemType.Empty;
-    const prevPosition = usePrevious(_props.positionY);
-    const prevPositionNormalize = prevPosition || 0
+export function GameElement(props: GameElementProps) {
+    const prevType = usePrevious(props.positionY) || ItemType.Empty;
+    const prevPosition = usePrevious(props.positionY) || 0;
     let animationConfig: {
         from?: { position: number[] },
         to?: { position: number[] }
     } = {
-        from: {position: [0, prevPositionNormalize, 0]},
-        to: {position: [0, _props.positionY, 0]}
+        from: {position: [0, prevPosition, 0]},
+        to: {position: [0, props.positionY, 0]}
     };
-    if (_props.elementType.key === 28) {
-        console.log("<<<<<Element>>>>>")
-        console.log(`prevType: ${prevType}, prevPos: ${prevPosition} `)
-        console.log(_props.elementType.key)
-        console.log(_props.elementType.type)
-        console.log(_props.positionY)
-    }
-    if (_props.elementType.isWillUnmount) {
+    if (props.elementType.isWillUnmount) {
         //Unmount
-        console.log("==Unmount==" + _props.elementType.key)
-        console.log("PrevType: " + prevType)
-        console.log("CurrType: " + _props.elementType.type)
-        console.log("PrevPos: " + prevPosition)
-        console.log("CurrPos: " + _props.positionY)
         animationConfig = {
-            from: {position: [0, _props.positionY, 0]},
+            from: {position: [0, props.positionY, 0]},
             to: {position: [0, -20, 0]}
         }
-    } else if (prevType === ItemType.Empty && _props.elementType.type !== ItemType.Empty) {
+    } else if (prevType === ItemType.Empty && props.elementType.type !== ItemType.Empty) {
         //First appears
-        console.log("==First appears==" + _props.elementType.key)
-        console.log("Prev: " + prevPosition)
-        console.log("Curr: " + _props.positionY)
         animationConfig = {
             from: {position: [0, 20, 0]},
-            to: {position: [0, _props.positionY, 0]}
+            to: {position: [0, props.positionY, 0]}
         }
-    } else if (prevPositionNormalize !== _props.positionY && _props.elementType.type !== ItemType.Empty) {
-        //drop down
-        console.log("==Y==" + _props.elementType.key)
-        console.log("Prev: " + prevPosition)
-        console.log("Curr: " + _props.positionY)
+    } else if (prevPosition !== props.positionY && props.elementType.type !== ItemType.Empty) {
+        //Drop down
         animationConfig = {
-            from: {position: [0, prevPositionNormalize, 0]},
-            to: {position: [0, _props.positionY, 0]}
+            from: {position: [0, prevPosition, 0]},
+            to: {position: [0, props.positionY, 0]}
         }
     }
-
-    const {position} = useSpring(animationConfig)
-    return _props.isShowing ?
-        <animated.group position={position}>
+    const springProps = useSpring(animationConfig)
+    return props.isShowing ?
+        <animated.group {...springProps}>
             <OBJModel
-                path={getPath(_props.elementType.type)}/>
+                position={new Vector3(0, 0, 0)}
+                path={getPath(props.elementType.type)}/>
         </animated.group>
         : null
 }

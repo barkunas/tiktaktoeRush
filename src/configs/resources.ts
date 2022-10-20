@@ -5,6 +5,7 @@ export const ResourcesPaths =  {
     point3: "/models/points/box_green",
     point4: "/models/points/box_blue",
     point5: "/models/points/box_pink",
+    point6: "/models/points/stones/model",
 };
 export const ResourcesUI =  {
     pinkBlock:"/models/ui/pink_block"
