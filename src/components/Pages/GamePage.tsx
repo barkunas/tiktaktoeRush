@@ -9,7 +9,7 @@ export function GamePage() {
             <OrbitControls makeDefault
                            enablePan={true}
                            enableZoom={true}
-                           autoRotate={true}
+                           autoRotate={false}
                            minPolarAngle={Math.PI / 4}
                            maxPolarAngle={Math.PI / 1}/>
             <GameUI>

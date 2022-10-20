@@ -26,7 +26,7 @@ export const OBJModel = React.forwardRef<Mesh, LoadOBJPNGProps>((props, ref) => 
         }, [obj]);
 
         return (
-            <mesh ref={ref} geometry={geometry} {...props}>
+            <mesh castShadow ref={ref} geometry={geometry} {...props}>
                 <meshPhysicalMaterial map={texture}
                                       color={props.color}
                                       opacity={props.opacity}

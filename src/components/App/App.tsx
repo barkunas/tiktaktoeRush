@@ -5,6 +5,7 @@ import { MainMenuPage } from "../Pages/MainMenuPage";
 
 export function App() {
     const page = useSelector(selectPage)
+    //return <GamePage/>
     switch (page.value) {
         case Pages.Menu:
             return <MainMenuPage/>

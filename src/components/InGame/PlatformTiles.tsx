@@ -1,0 +1,119 @@
+import { globalOffset, Model3DType, ModelPositionType, pillarSize } from "./Platforms";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { ThreeEvent } from "@react-three/fiber";
+import { ItemsCounter, ItemType } from "./ItemType";
+import { setModel } from "../../redux/Model3DReducer";
+import { ItemFinder } from "./ItemFinder";
+import { increment } from "../../redux/GameCounterReducer";
+import { PillarTile } from "./PillarTile";
+import { lock, selectBlockerValue, unlock } from "../../redux/ClickTilesBlockerReducer";
+
+export type PlatformTilesProps = {
+    positionInModel: ModelPositionType
+}
+
+const defaultOpacity = 0.5;
+const hoverOpacity = 1;
+
+export function PlatformTiles(props: PlatformTilesProps) {
+    const [opacity, setOpacity] = useState(defaultOpacity);
+    const dispatch = useDispatch();
+    const clickBlocker = useSelector(selectBlockerValue)
+    const model = useSelector<{ model: { value: Model3DType } }, Model3DType>(state => state.model.value)
+    const pillarModel = model[props.positionInModel[0]][props.positionInModel[1]]
+
+    const positionX = globalOffset * props.positionInModel[0];
+    const positionY = globalOffset * props.positionInModel[1];
+    const platformOnPointerEnterHandler = (e: ThreeEvent<MouseEvent>) => {
+        e.stopPropagation()
+        setOpacity(hoverOpacity)
+    }
+    const platformOnPointerLeaveHandler = (e: ThreeEvent<MouseEvent>) => {
+        e.stopPropagation()
+        setOpacity(defaultOpacity)
+    }
+    const onclickHandler = (e: ThreeEvent<MouseEvent>) => {
+        if (clickBlocker) return;
+        e.stopPropagation();
+        updateModel3D(model, props.positionInModel)
+
+    }
+
+    const updateModel3D = (model: Model3DType, position: ModelPositionType) => {
+        const newModel = JSON.parse(JSON.stringify(model)) as Model3DType;
+        const pillarModel = newModel[position[0]][position[1]];
+        for (let i = 0; i < pillarModel.length; i++) {
+            if (pillarModel[i].type === ItemType.Empty) {
+                pillarModel[i].type = getRandomAItemType();
+                pillarModel[i].key = ItemsCounter.increment();
+                dispatch(setModel(newModel));
+                dispatch(lock())
+                recursiveChecking(newModel)
+                break;
+            }
+        }
+    }
+
+    function recursiveChecking(model: Model3DType) {
+        const newModel2 = JSON.parse(JSON.stringify(model)) as Model3DType;
+        const items = ItemFinder.findAllLines3D(newModel2)
+        if (items.length !== 0) {
+            setTimeout(() => {
+                items.forEach(it => {
+                    it.isWillUnmount = true;
+                    console.log("WaitUnmount")
+                    dispatch(increment())
+                })
+                dispatch(setModel(newModel2));
+                setTimeout(() => {
+                        const newModel3 = JSON.parse(JSON.stringify(newModel2)) as Model3DType;
+                        fallItemsToEmptyPlaces(newModel3)
+                        console.log("unmount")
+                        dispatch(setModel(newModel3));
+                        recursiveChecking(newModel3)
+                    }, 300
+                )
+            }, 1000);
+        } else {
+            dispatch(unlock())
+        }
+    }
+
+    const tiles = pillarModel.map((it, index) => {
+        return (
+            <group
+                onPointerEnter={platformOnPointerEnterHandler}
+                onPointerLeave={platformOnPointerLeaveHandler}
+                onClick={onclickHandler}
+                position={[positionX, index * globalOffset, positionY]}
+                key={index}>
+                <PillarTile opacity={opacity}/>
+            </group>
+        )
+    })
+    return (<>{tiles}</>)
+}
+
+
+function getRandomAItemType() {
+    //return 3
+    const min = 3;
+    const max = 5
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function fallItemsToEmptyPlaces(model: Model3DType) {
+    model.forEach((pillars, pillarsIndex) => {
+        pillars.forEach((pillar, pillarIndex) => {
+            pillars[pillarIndex] = pillar.filter(it => it.isWillUnmount == null && it.type !== ItemType.Empty);
+            while (pillars[pillarIndex].length < pillarSize) {
+                pillars[pillarIndex].push({
+                    type: ItemType.Empty,
+                    key: ItemsCounter.increment()
+                });
+            }
+        })
+    })
+    return model;
+}

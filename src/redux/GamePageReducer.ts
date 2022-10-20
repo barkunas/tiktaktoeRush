@@ -27,3 +27,5 @@ export const selectPage = (state: { page: { value: number } }) => {
 };
 
 export default pageSlice.reducer
+
+

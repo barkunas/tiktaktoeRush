@@ -7,12 +7,16 @@ export enum ItemType {
     PinkBox
 }
 
-export enum ItemStatus {
-    New,
-    Old
-}
-
 export type ItemObjectType = {
     type: ItemType,
-    status: ItemStatus
+    key: number,
+    isWillUnmount?: boolean
+}
+
+export class ItemsCounter {
+    private static value = 0;
+
+    public static increment() {
+        return ItemsCounter.value += 1
+    }
 }
