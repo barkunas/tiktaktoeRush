@@ -1,6 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { Item, ItemsCounter, ItemType } from "../components/InGame/ItemType";
-import { Model3DType } from "../components/InGame/Platforms";
+import { createSlice, Draft } from '@reduxjs/toolkit';
+import { Item } from "../components/InGame/ItemType";
 
 export type ItemInQueueType = {
     element: Item,
@@ -17,13 +16,14 @@ for (let i = 0; i < initialItemsQueueSize; i++) {
 }
 
 export const itemsQueueSlice = createSlice({
-    name: 'queue',
+    name: 'itemsQueue',
     initialState: {
         value: initialItemsQueue,
     },
     reducers: {
-        dequeue: (state, action) => {
-            state.value[0].isDequeue = true;
+        dequeue: (state: Draft<{ value: ItemsQueueType }>) => {
+            const last = findLastIndex(state.value, it => it.isDequeue)
+            state.value[last + 1].isDequeue = true;
             state.value.push({element: new Item(), isDequeue: false})
         },
     },
@@ -31,8 +31,21 @@ export const itemsQueueSlice = createSlice({
 
 export const {dequeue} = itemsQueueSlice.actions
 
-export const selectQueue = (state: { queue: { value: ItemsQueueType } }) => {
-    return state.queue
+export const selectQueue = (state: { itemsQueue: { value: ItemsQueueType } }) => {
+    return state.itemsQueue;
+};
+
+export const selectFirst = (state: { itemsQueue: { value: ItemsQueueType } }) => {
+    return state.itemsQueue.value[findLastIndex(state.itemsQueue.value, it => it.isDequeue)+1]
 };
 
 export default itemsQueueSlice.reducer
+
+export function findLastIndex<T>(array: Array<T>, predicate: (value: T, index: number, obj: T[]) => boolean): number {
+    let l = array.length;
+    while (l--) {
+        if (predicate(array[l], l, array))
+            return l;
+    }
+    return -1;
+}

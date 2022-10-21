@@ -3,11 +3,31 @@ import { ReactNode, useMemo, useRef } from "react";
 import { Scene as ThreeScene } from "three";
 import { OrthographicCamera, useCamera } from "@react-three/drei";
 
+export enum HorizontalAlignment {
+    Center,
+    Left,
+    Right
+}
+
+export enum VerticalAlignment {
+    Center,
+    Top,
+    Bottom
+}
+
 export type GameUIProps = {
-    children: ReactNode
+    children: ReactNode,
+    hAignment?: HorizontalAlignment,
+    vAignment?: VerticalAlignment
+}
+
+const defaultGameUIProps = {
+    hAignment: HorizontalAlignment.Center,
+    vAignment: VerticalAlignment.Center
 }
 
 export function GameUI(props: GameUIProps) {
+    props = {...defaultGameUIProps, ...props}
     const {gl, scene, camera, size} = useThree()
     const virtualCam = useRef<Camera>(null!)
     const virtualScene = useMemo(() => new ThreeScene(), [])

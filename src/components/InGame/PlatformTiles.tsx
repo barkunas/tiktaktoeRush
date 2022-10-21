@@ -9,6 +9,7 @@ import { increment } from "../../redux/GameCounterReducer";
 import { PillarTile } from "./PillarTile";
 import { lock, selectBlockerValue, unlock } from "../../redux/ClickTilesBlockerReducer";
 import { CloneModel3DType } from "../Helpers/CloneModel3DType";
+import { dequeue, selectFirst } from "../../redux/ItemsQueueReducer";
 
 export type PlatformTilesProps = {
     positionInModel: ModelPositionType
@@ -21,6 +22,7 @@ export function PlatformTiles(props: PlatformTilesProps) {
     const [opacity, setOpacity] = useState(defaultOpacity);
     const dispatch = useDispatch();
     const clickBlocker = useSelector(selectBlockerValue)
+    const nextItem = useSelector(selectFirst)
     const model = useSelector<{ model: { value: Model3DType } }, Model3DType>(state => state.model.value)
     const pillarModel = model[props.positionInModel[0]][props.positionInModel[1]]
 
@@ -37,6 +39,7 @@ export function PlatformTiles(props: PlatformTilesProps) {
     const onclickHandler = (e: ThreeEvent<MouseEvent>) => {
         if (clickBlocker) return;
         e.stopPropagation();
+        dispatch(dequeue())
         updateModel3D(model, props.positionInModel)
 
     }
@@ -46,7 +49,7 @@ export function PlatformTiles(props: PlatformTilesProps) {
         const pillarModel = newModel[position[0]][position[1]];
         for (let i = 0; i < pillarModel.length; i++) {
             if (pillarModel[i].type === ItemType.Empty) {
-                pillarModel[i] = new Item();
+                pillarModel[i] = nextItem.element;
                 dispatch(setModel(newModel));
                 dispatch(lock())
                 recursiveChecking(newModel)

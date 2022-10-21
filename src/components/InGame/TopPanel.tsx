@@ -9,10 +9,9 @@ import { useThree } from "@react-three/fiber";
 
 export function TopPanel() {
     const {size} = useThree()
-    const tempRef = useRef<Group>(null!)
     const counter = useSelector(selectCount);
     return (
-        <group ref={tempRef} position={[0, 0, 0]}>
+        <group position={[0, 0, 0]}>
             <group position={[size.width / 2, size.height / 2, -100]}
                    scale={[size.height / 2, size.height / 2, size.height / 2]}>
                 <group
