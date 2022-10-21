@@ -1,16 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { ItemsCounter, ItemType } from "../components/InGame/ItemType";
+import { Item, ItemsCounter, ItemType } from "../components/InGame/ItemType";
 import { Model3DType } from "../components/InGame/Platforms";
+import { CloneModel3DType } from "../components/Helpers/CloneModel3DType";
 
 export const initialModel3D: Model3DType = [[[], [], []], [[], [], []], [[], [], []]];
 
 initialModel3D.forEach(k => {
     k.forEach(t => {
         for (let i = 0; i < 3; i++) {
-            t.push({
-                type: ItemType.Empty,
-                key: ItemsCounter.increment()
-            })
+            t.push(new Item(true))
         }
     })
 })
@@ -22,7 +20,7 @@ export const model3DSlice = createSlice({
     },
     reducers: {
         setModel: (state, action) => {
-            state.value = [...(action.payload)]
+            state.value = CloneModel3DType(action.payload)
         },
     },
 })

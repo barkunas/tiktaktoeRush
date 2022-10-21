@@ -2,12 +2,13 @@ import { globalOffset, Model3DType, ModelPositionType, pillarSize } from "./Plat
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ThreeEvent } from "@react-three/fiber";
-import { ItemsCounter, ItemType } from "./ItemType";
+import { Item, ItemType } from "./ItemType";
 import { setModel } from "../../redux/Model3DReducer";
 import { ItemFinder } from "./ItemFinder";
 import { increment } from "../../redux/GameCounterReducer";
 import { PillarTile } from "./PillarTile";
 import { lock, selectBlockerValue, unlock } from "../../redux/ClickTilesBlockerReducer";
+import { CloneModel3DType } from "../Helpers/CloneModel3DType";
 
 export type PlatformTilesProps = {
     positionInModel: ModelPositionType
@@ -41,12 +42,11 @@ export function PlatformTiles(props: PlatformTilesProps) {
     }
 
     const updateModel3D = (model: Model3DType, position: ModelPositionType) => {
-        const newModel = JSON.parse(JSON.stringify(model)) as Model3DType;
+        const newModel = CloneModel3DType(model);
         const pillarModel = newModel[position[0]][position[1]];
         for (let i = 0; i < pillarModel.length; i++) {
             if (pillarModel[i].type === ItemType.Empty) {
-                pillarModel[i].type = getRandomAItemType();
-                pillarModel[i].key = ItemsCounter.increment();
+                pillarModel[i] = new Item();
                 dispatch(setModel(newModel));
                 dispatch(lock())
                 recursiveChecking(newModel)
@@ -56,18 +56,18 @@ export function PlatformTiles(props: PlatformTilesProps) {
     }
 
     function recursiveChecking(model: Model3DType) {
-        const newModel2 = JSON.parse(JSON.stringify(model)) as Model3DType;
+        const newModel2 = CloneModel3DType(model);
         const items = ItemFinder.findAllLines3D(newModel2)
         if (items.length !== 0) {
             setTimeout(() => {
                 items.forEach(it => {
-                    it.isWillUnmount = true;
+                    it.willUnmount();
                     console.log("WaitUnmount")
                     dispatch(increment())
                 })
                 dispatch(setModel(newModel2));
                 setTimeout(() => {
-                        const newModel3 = JSON.parse(JSON.stringify(newModel2)) as Model3DType;
+                        const newModel3 = CloneModel3DType(newModel2);
                         fallItemsToEmptyPlaces(newModel3)
                         console.log("unmount")
                         dispatch(setModel(newModel3));
@@ -95,23 +95,12 @@ export function PlatformTiles(props: PlatformTilesProps) {
     return (<>{tiles}</>)
 }
 
-
-function getRandomAItemType() {
-    //return 3
-    const min = 3;
-    const max = 5;
-    return Math.floor(Math.random() * (max - min + 1) + min)
-}
-
 function fallItemsToEmptyPlaces(model: Model3DType) {
     model.forEach((pillars, pillarsIndex) => {
         pillars.forEach((pillar, pillarIndex) => {
-            pillars[pillarIndex] = pillar.filter(it => it.isWillUnmount == null && it.type !== ItemType.Empty);
+            pillars[pillarIndex] = pillar.filter(it => it.isWillUnmount === false && it.type !== ItemType.Empty);
             while (pillars[pillarIndex].length < pillarSize) {
-                pillars[pillarIndex].push({
-                    type: ItemType.Empty,
-                    key: ItemsCounter.increment()
-                });
+                pillars[pillarIndex].push(new Item(true));
             }
         })
     })

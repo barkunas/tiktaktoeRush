@@ -8,12 +8,6 @@ export enum ItemType {
     Stone_0
 }
 
-export type ItemObjectType = {
-    type: ItemType,
-    key: number,
-    isWillUnmount?: boolean
-}
-
 export class ItemsCounter {
     private static value = 0;
 
@@ -37,7 +31,7 @@ export class Item {
         return Math.floor(Math.random() * (max - min + 1) + min)
     }
 
-    private readonly _type: ItemType
+    private _type: ItemType
 
     public get type() {
         return this._type
@@ -48,14 +42,36 @@ export class Item {
         return this._isWillUnmount
     }
 
-    public readonly key: number
+    private _key: number
+    public get key() {
+        return this._key
+    }
 
     constructor(isEmpty = false) {
         this._type = isEmpty ? ItemType.Empty : Item.getRandomAItemType();
-        this.key = Item.increment()
+        this._key = Item.increment()
     }
 
     public willUnmount() {
         this._isWillUnmount = true;
+    }
+
+    public clone() {
+        const _this = new Item();
+        _this._type = this.type;
+        _this._key = this.key;
+        _this._isWillUnmount = this.isWillUnmount;
+        return _this
+    }
+
+    toJSON() {
+        return `{
+            "key":${this.key},
+            "type":${this.type},
+            "isWillUnmount":${this.isWillUnmount},
+            "_key":${this._key},
+            "_type":${this._type},
+            "_isWillUnmount":${this._isWillUnmount},
+        }`
     }
 }

@@ -1,12 +1,12 @@
-import { OBJModel, ObjModel2 } from "../Helpers/OBJModel";
+import { OBJModel } from "../Helpers/OBJModel";
 import { ResourcesPaths } from "../../configs/resources";
-import { ItemObjectType, ItemType } from "./ItemType";
+import { Item, ItemType } from "./ItemType";
 import React, { useEffect, useRef } from "react";
 import { animated, useSpring } from "@react-spring/three";
 import { Vector3 } from "three";
 
 type GameElementProps = {
-    elementType: ItemObjectType,
+    elementType: Item,
     isShowing: boolean,
     positionY: number
 }

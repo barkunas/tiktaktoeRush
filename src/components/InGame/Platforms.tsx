@@ -1,9 +1,10 @@
-import { ItemObjectType } from "./ItemType";
+import { Item } from "./ItemType";
 import { PlatformPillar } from "./PlatformPillar";
 import { initialModel3D } from "../../redux/Model3DReducer";
 
 export type Model3DType = PillarModelType[][];
-export type PillarModelType = ItemObjectType[];
+
+export type PillarModelType = Item[];
 export type ModelPositionType = [number, number]
 export const globalOffset = 4;
 export const pillarSize = 3;

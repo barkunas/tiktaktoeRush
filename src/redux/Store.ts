@@ -12,4 +12,7 @@ export default configureStore({
         model: Model3DReducer,
         clickTilesBlocker: ClickTilesBlockerReducer
     },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        serializableCheck: false
+    }),
 });

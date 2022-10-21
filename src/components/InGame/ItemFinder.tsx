@@ -1,10 +1,10 @@
-import { ItemObjectType, ItemType } from "./ItemType";
+import { Item, ItemType } from "./ItemType";
 import { Model3DType } from "./Platforms";
 
 export class ItemFinder {
 
     static findAllLines3D(model: Model3DType) {
-        let items: ItemObjectType[] = [];
+        let items: Item[] = [];
         model.forEach((pillars, x) => {
             pillars.forEach((pillar, y) => {
                 pillar.forEach((item, z) => {
@@ -17,7 +17,7 @@ export class ItemFinder {
         return items;
     }
 
-    constructor(private readonly model3D: Model3DType, public readonly link: ItemObjectType, public readonly x: number, public readonly y: number, public readonly z: number) {
+    constructor(private readonly model3D: Model3DType, public readonly link: Item, public readonly x: number, public readonly y: number, public readonly z: number) {
     }
 
     public check() {
@@ -41,7 +41,7 @@ export class ItemFinder {
         ];
     }
 
-    private checkNeighbours(left: [x: number, y: number, z: number], right: [x: number, y: number, z: number]): ItemObjectType[] {
+    private checkNeighbours(left: [x: number, y: number, z: number], right: [x: number, y: number, z: number]): Item[] {
         try {
             const _left = this.model3D[left[0]][left[1]][left[2]]
             const _right = this.model3D[right[0]][right[1]][right[2]]

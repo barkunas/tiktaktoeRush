@@ -7,8 +7,6 @@ import { OBJModel } from "../Helpers/OBJModel";
 import { ResourcesUI } from "../../configs/resources";
 import { useThree } from "@react-three/fiber";
 
-type TopPanleProps = {}
-
 export function TopPanel() {
     const {size} = useThree()
     const tempRef = useRef<Group>(null!)

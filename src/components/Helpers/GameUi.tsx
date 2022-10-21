@@ -2,7 +2,6 @@ import { Camera, createPortal, useFrame, useThree } from "@react-three/fiber";
 import { ReactNode, useMemo, useRef } from "react";
 import { Scene as ThreeScene } from "three";
 import { OrthographicCamera, useCamera } from "@react-three/drei";
-import { TopPanel } from "../InGame/TopPanel";
 
 export type GameUIProps = {
     children: ReactNode
