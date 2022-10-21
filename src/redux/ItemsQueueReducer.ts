@@ -1,10 +1,10 @@
-
 import { createSlice } from '@reduxjs/toolkit';
-import { ItemObjectType, ItemsCounter, ItemType } from "../components/InGame/ItemType";
+import { Item, ItemsCounter, ItemType } from "../components/InGame/ItemType";
 import { Model3DType } from "../components/InGame/Platforms";
 
 export type ItemInQueueType = {
-    element: ItemObjectType
+    element: Item,
+    isDequeue: boolean
 }
 export type ItemsQueueType = ItemInQueueType[];
 
@@ -13,25 +13,26 @@ export const initialItemsQueue: ItemsQueueType = [];
 export const initialItemsQueueSize = 4;
 
 for (let i = 0; i < initialItemsQueueSize; i++) {
-
+    initialItemsQueue.push({element: new Item(), isDequeue: false})
 }
 
-/*export const model3DSlice = createSlice({
-    name: 'model',
+export const itemsQueueSlice = createSlice({
+    name: 'queue',
     initialState: {
-        value: initialModel3D,
+        value: initialItemsQueue,
     },
     reducers: {
-        setModel: (state, action) => {
-            state.value = [...(action.payload)]
+        dequeue: (state, action) => {
+            state.value[0].isDequeue = true;
+            state.value.push({element: new Item(), isDequeue: false})
         },
     },
 })
 
-export const {setModel} = model3DSlice.actions
+export const {dequeue} = itemsQueueSlice.actions
 
-export const selectModel = (state: { model: { value: Model3DType } }) => {
-    return state.model
+export const selectQueue = (state: { queue: { value: ItemsQueueType } }) => {
+    return state.queue
 };
 
-export default model3DSlice.reducer*/
+export default itemsQueueSlice.reducer
