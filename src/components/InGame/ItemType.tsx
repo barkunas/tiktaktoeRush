@@ -14,14 +14,6 @@ export enum ItemType {
     Stone_0
 }
 
-export class ItemsCounter {
-    private static value = 0;
-
-    public static increment() {
-        return ItemsCounter.value += 1
-    }
-}
-
 export class Item {
 
     private static value = 0;

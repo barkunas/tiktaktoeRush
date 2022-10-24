@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Item, ItemsCounter, ItemType } from "../components/InGame/ItemType";
+import { Item } from "../components/InGame/ItemType";
 import { Model3DType } from "../components/InGame/Platforms";
 import { CloneModel3DType } from "../components/Helpers/CloneModel3DType";
 

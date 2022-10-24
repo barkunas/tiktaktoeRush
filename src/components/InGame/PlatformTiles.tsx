@@ -77,30 +77,30 @@ export function PlatformTiles(props: PlatformTilesProps) {
         }
     }
 
-    function recursiveChecking(model: Model3DType, opponentToken?: boolean) {
+    async function recursiveChecking(model: Model3DType, opponentToken?: boolean) {
         dispatch(lock());
         const newModel2 = CloneModel3DType(model);
         const items = ItemFinder.findAllLines3D(newModel2)
         if (items.length !== 0) {
-            setTimeout(() => {
+            await Delayed(() => {
                 items.forEach(it => {
                     it.willUnmount();
                     dispatch(increment())
                 })
                 dispatch(setModel(newModel2));
-                setTimeout(() => {
-                        const newModel3 = CloneModel3DType(newModel2);
-                        fallItemsToEmptyPlaces(newModel3);
-                        dispatch(setModel(newModel3));
-                        recursiveChecking(newModel3, opponentToken);
-                    }, 300
-                )
             }, 1000);
+            await Delayed(() => {
+                const newModel3 = CloneModel3DType(newModel2);
+                fallItemsToEmptyPlaces(newModel3);
+                dispatch(setModel(newModel3));
+                recursiveChecking(newModel3, opponentToken);
+            }, 300)
         } else {
             opponentToken && dispatch(unlock());
             console.log("opponentsBotProcess")
-            setTimeout(() => opponentsBotProcess(model, opponentToken), 1000)
-
+            await Delayed(()=>{
+                opponentsBotProcess(model, opponentToken)
+            },1100)
         }
     }
 
@@ -129,4 +129,11 @@ function fallItemsToEmptyPlaces(model: Model3DType) {
         })
     })
     return model;
+}
+
+async function Delayed(fn: Function, ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(() => {
+        fn();
+        resolve();
+    }, ms));
 }
