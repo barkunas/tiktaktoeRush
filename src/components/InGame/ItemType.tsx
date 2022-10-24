@@ -33,7 +33,7 @@ export class Item {
     private static getRandomAItemType() {
         //return 3
         const min = ItemType.GreenBox;
-        const max = ItemType.PresicBox;
+        const max = ItemType.PinkBox;
         return Math.floor(Math.random() * (max - min + 1) + min)
     }
 
