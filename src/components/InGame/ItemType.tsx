@@ -5,6 +5,12 @@ export enum ItemType {
     GreenBox,
     BlueBox,
     PinkBox,
+    YellowBox,
+    RedBox,
+    BrownBox,
+    WhiteBox,
+    BlackBox,
+    PresicBox,
     Stone_0
 }
 
@@ -27,7 +33,7 @@ export class Item {
     private static getRandomAItemType() {
         //return 3
         const min = ItemType.GreenBox;
-        const max = ItemType.PinkBox;
+        const max = ItemType.PresicBox;
         return Math.floor(Math.random() * (max - min + 1) + min)
     }
 

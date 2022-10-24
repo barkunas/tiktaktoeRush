@@ -19,8 +19,26 @@ export function getPath(type: ItemType): string {
         case ItemType.PinkBox:
             path = ResourcesPaths.point5;
             break;
-        case ItemType.Stone_0:
+        case ItemType.YellowBox:
             path = ResourcesPaths.point6;
+            break;
+        case ItemType.RedBox:
+            path = ResourcesPaths.point7;
+            break;
+        case ItemType.BrownBox:
+            path = ResourcesPaths.point8;
+            break;
+        case ItemType.WhiteBox:
+            path = ResourcesPaths.point9;
+            break;
+        case ItemType.BlackBox:
+            path = ResourcesPaths.point10;
+            break;
+        case ItemType.PresicBox:
+            path = ResourcesPaths.point11;
+            break;
+        case ItemType.Stone_0:
+            path = ResourcesPaths.point12;
             break;
         default:
             return path

@@ -21,65 +21,80 @@ const hoverOpacity = 1;
 export function PlatformTiles(props: PlatformTilesProps) {
     const [opacity, setOpacity] = useState(defaultOpacity);
     const dispatch = useDispatch();
-    const clickBlocker = useSelector(selectBlockerValue)
-    const nextItem = useSelector(selectFirst)
-    const model = useSelector<{ model: { value: Model3DType } }, Model3DType>(state => state.model.value)
-    const pillarModel = model[props.positionInModel[0]][props.positionInModel[1]]
+    const clickBlocker = useSelector(selectBlockerValue);
+    const nextItem = useSelector(selectFirst);
+    const model = useSelector<{ model: { value: Model3DType } }, Model3DType>(state => state.model.value);
+    const pillarModel = model[props.positionInModel[0]][props.positionInModel[1]];
 
     const positionX = globalOffset * props.positionInModel[0];
     const positionY = globalOffset * props.positionInModel[1];
     const platformOnPointerEnterHandler = (e: ThreeEvent<MouseEvent>) => {
-        e.stopPropagation()
-        setOpacity(hoverOpacity)
+        e.stopPropagation();
+        setOpacity(hoverOpacity);
     }
     const platformOnPointerLeaveHandler = (e: ThreeEvent<MouseEvent>) => {
-        e.stopPropagation()
-        setOpacity(defaultOpacity)
+        e.stopPropagation();
+        setOpacity(defaultOpacity);
     }
     const onclickHandler = (e: ThreeEvent<MouseEvent>) => {
         if (clickBlocker) return;
         e.stopPropagation();
-        dispatch(dequeue())
-        updateModel3D(model, props.positionInModel)
+        dispatch(dequeue());
+        updateModel3D(model, props.positionInModel);
 
     }
 
-    const updateModel3D = (model: Model3DType, position: ModelPositionType) => {
+    function opponentsBotProcess(model: Model3DType, opponentToken?: boolean) {
+        if (opponentToken != null) return;
+        const newModel = CloneModel3DType(model);
+        updateModel3D(newModel, getRandomPillar(), true)
+    }
+
+    function getRandomPillar(): ModelPositionType {
+        return [
+            Math.floor(Math.random() * pillarSize),
+            Math.floor(Math.random() * pillarSize)
+        ]
+    }
+
+    function updateModel3D(model: Model3DType, position: ModelPositionType, opponentToken?: boolean) {
         const newModel = CloneModel3DType(model);
         const pillarModel = newModel[position[0]][position[1]];
         for (let i = 0; i < pillarModel.length; i++) {
             if (pillarModel[i].type === ItemType.Empty) {
                 pillarModel[i] = nextItem.element;
                 dispatch(setModel(newModel));
-                dispatch(lock())
-                recursiveChecking(newModel)
+                dispatch(lock());
+                recursiveChecking(newModel, opponentToken);
                 break;
             }
         }
     }
 
-    function recursiveChecking(model: Model3DType) {
+    function recursiveChecking(model: Model3DType, opponentToken?: boolean) {
+        dispatch(lock());
         const newModel2 = CloneModel3DType(model);
         const items = ItemFinder.findAllLines3D(newModel2)
         if (items.length !== 0) {
             setTimeout(() => {
                 items.forEach(it => {
                     it.willUnmount();
-                    console.log("WaitUnmount")
                     dispatch(increment())
                 })
                 dispatch(setModel(newModel2));
                 setTimeout(() => {
                         const newModel3 = CloneModel3DType(newModel2);
-                        fallItemsToEmptyPlaces(newModel3)
-                        console.log("unmount")
+                        fallItemsToEmptyPlaces(newModel3);
                         dispatch(setModel(newModel3));
-                        recursiveChecking(newModel3)
+                        recursiveChecking(newModel3, opponentToken);
                     }, 300
                 )
             }, 1000);
         } else {
-            dispatch(unlock())
+            opponentToken && dispatch(unlock());
+            console.log("opponentsBotProcess")
+            setTimeout(() => opponentsBotProcess(model, opponentToken), 1000)
+
         }
     }
 
@@ -99,9 +114,9 @@ export function PlatformTiles(props: PlatformTilesProps) {
 }
 
 function fallItemsToEmptyPlaces(model: Model3DType) {
-    model.forEach((pillars, pillarsIndex) => {
+    model.forEach((pillars) => {
         pillars.forEach((pillar, pillarIndex) => {
-            pillars[pillarIndex] = pillar.filter(it => it.isWillUnmount === false && it.type !== ItemType.Empty);
+            pillars[pillarIndex] = pillar.filter(it => !it.isWillUnmount && it.type !== ItemType.Empty);
             while (pillars[pillarIndex].length < pillarSize) {
                 pillars[pillarIndex].push(new Item(true));
             }
