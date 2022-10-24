@@ -39,25 +39,31 @@ export function PlatformTiles(props: PlatformTilesProps) {
     const onclickHandler = (e: ThreeEvent<MouseEvent>) => {
         if (clickBlocker) return;
         e.stopPropagation();
-        dispatch(dequeue());
-        updateModel3D(model, props.positionInModel);
+        isFreePillar(model, props.positionInModel) && updateModel3D(model, props.positionInModel);
 
     }
 
     function opponentsBotProcess(model: Model3DType, opponentToken?: boolean) {
         if (opponentToken != null) return;
         const newModel = CloneModel3DType(model);
-        updateModel3D(newModel, getRandomPillar(), true)
+        updateModel3D(newModel, getAbsentRandomPillar(newModel), true)
     }
 
-    function getRandomPillar(): ModelPositionType {
-        return [
-            Math.floor(Math.random() * pillarSize),
-            Math.floor(Math.random() * pillarSize)
-        ]
+    function getAbsentRandomPillar(model: Model3DType): ModelPositionType {
+        const freePillar: ModelPositionType[] = [];
+        model.forEach((pillars, i) => pillars.forEach((pillar, k) => {
+            if (isFreePillar(model, [i, k])) freePillar.push([i, k])
+        }))
+        if (freePillar.length === 0) throw new Error("End game")
+        return freePillar[Math.floor(Math.random() * freePillar.length)]
+    }
+
+    function isFreePillar(model: Model3DType, position: ModelPositionType) {
+        return model[position[0]][position[1]].some(it => it.type === ItemType.Empty);
     }
 
     function updateModel3D(model: Model3DType, position: ModelPositionType, opponentToken?: boolean) {
+        dispatch(dequeue());
         const newModel = CloneModel3DType(model);
         const pillarModel = newModel[position[0]][position[1]];
         for (let i = 0; i < pillarModel.length; i++) {
